@@ -1,22 +1,29 @@
-"""Gera o jogo a partir de src/:
-- alith-puzzle.html : arquivo único para abrir direto no navegador
-- app/              : versão PWA (instalável quando servida por HTTPS)
+"""Gera os jogos a partir de src/:
+- alith-puzzle.html / alith-jigsaw.html : arquivos únicos para abrir direto no navegador
+- app/ (index.html = deslizante, jigsaw.html = encaixe) : versão PWA (instalável por HTTPS)
 """
 import base64, io, json, pathlib
 from PIL import Image
 
 root = pathlib.Path(__file__).parent
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 img = Image.open(root / "src" / "alith.png").convert("RGB")
 buf = io.BytesIO()
 img.save(buf, "JPEG", quality=90, optimize=True, progressive=True)
 data = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
-tpl = (root / "src" / "template.html").read_text(encoding="utf-8").replace("__IMG__", data)
+# (template, arquivo avulso, página no PWA)
+GAMES = [("template.html", "alith-puzzle.html", "index.html"),
+         ("jigsaw.html", "alith-jigsaw.html", "jigsaw.html")]
+tpls = {src: (root / "src" / src).read_text(encoding="utf-8").replace("__IMG__", data) for src, _, _ in GAMES}
 
-# 1) arquivo único
-(root / "alith-puzzle.html").write_text(
-    tpl.replace("__PWA_HEAD__", "").replace("__PWA_SW__", ""), encoding="utf-8")
+def other(i, k):  # link para o outro jogo
+    return GAMES[1 - i][k]
+
+# 1) arquivos únicos
+for i, (src, single, _) in enumerate(GAMES):
+    (root / single).write_text(tpls[src].replace("__PWA_HEAD__", "").replace("__PWA_SW__", "")
+                               .replace("__OTHER__", other(i, 1)), encoding="utf-8")
 
 # 2) PWA
 app = root / "app"; (app / "icons").mkdir(parents=True, exist_ok=True)
@@ -41,8 +48,9 @@ head = """<meta name="theme-color" content="#0b0710">
 sw_reg = """if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }"""
-(app / "index.html").write_text(
-    tpl.replace("__PWA_HEAD__", head).replace("__PWA_SW__", sw_reg), encoding="utf-8")
+for i, (src, _, page) in enumerate(GAMES):
+    (app / page).write_text(tpls[src].replace("__PWA_HEAD__", head).replace("__PWA_SW__", sw_reg)
+                            .replace("__OTHER__", other(i, 2)), encoding="utf-8")
 
 manifest = {
     "name": "Alith Yngvirld",
@@ -64,7 +72,7 @@ manifest = {
 (app / "manifest.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
 sw = f"""const CACHE = 'alith-{VERSION}';
-const FILES = ['./', 'index.html', 'manifest.webmanifest',
+const FILES = ['./', 'index.html', 'jigsaw.html', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 self.addEventListener('install', e => {{
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

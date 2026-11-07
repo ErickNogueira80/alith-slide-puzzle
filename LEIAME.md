@@ -1,8 +1,8 @@
-# Alith Yngvirld · Slide Puzzle (18+)
+# Alith Yngvirld · Quebra-cabeças (18+)
 
 ## O que é
-Quebra-cabeça deslizante (estilo 15-puzzle) com a arte da personagem **Alith Yngvirld**, paladina de
-Atraídes. Cinco capítulos de dificuldade crescente; cada um, ao ser resolvido, revela um trecho da
+Dois jogos com a arte da personagem **Alith Yngvirld**, paladina de
+Atraídes. **Deslizante** (slide puzzle, estilo 15-puzzle) e **Encaixe** (jigsaw: peças com encaixes arrastadas de uma bandeja). Cada jogo tem cinco capítulos de dificuldade crescente; cada um, ao ser resolvido, revela um trecho da
 história da personagem. Classificação 18+ (nudez sugerida, sangue, temas sombrios), com portão de idade.
 
 - **Cliente/área:** pessoal (lazer). Fora do assistente por decisão do Erick (2026-11-07).
@@ -11,10 +11,10 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 ## Onde está
 - Pasta: `D:\Erick\Jogos\alith-slide-puzzle`
 - Repositório: https://github.com/ErickNogueira80/alith-slide-puzzle (**PÚBLICO temporariamente** desde 2026-11-07 para teste no celular; Erick vai voltar para privado. Colaborador: Mark666DooM)
-- Jogo online (temporário): https://ericknogueira80.github.io/alith-slide-puzzle/app/ (GitHub Pages; some ao voltar para privado)
-- Jogo pronto: `alith-puzzle.html` (arquivo único, imagem embutida; abre em qualquer navegador e no celular)
+- Jogo online (temporário): deslizante https://ericknogueira80.github.io/alith-slide-puzzle/app/ · encaixe https://ericknogueira80.github.io/alith-slide-puzzle/app/jigsaw.html (GitHub Pages; some ao voltar para privado)
+- Jogos prontos: `alith-puzzle.html` (deslizante) e `alith-jigsaw.html` (encaixe) (arquivo único, imagem embutida; abre em qualquer navegador e no celular)
 - PWA: pasta `app/` (index.html, manifest, service worker offline, ícones). Só instala servida por HTTPS; hoje **não hospedado** (decisão de 2026-11-07), fica pronta para o futuro.
-- Fontes: `src/template.html` (código) + `src/alith.png` (arte original)
+- Fontes: `src/template.html` (deslizante), `src/jigsaw.html` (encaixe) + `src/alith.png` (arte original)
 
 ## Como rodar
 - Jogar no PC: abrir `alith-puzzle.html`.
@@ -35,6 +35,19 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 | IV | As Cicatrizes | 5×6 |
 | V | A Paladina | 5×7 |
 
+### Encaixe (jigsaw)
+- Arraste a peça da bandeja (lateral no PC, embaixo no celular, puxando para cima) até o lugar dela; perto do certo ela encaixa, senão volta e conta erro.
+- **Sombra**: imagem fraca no fundo do tabuleiro. **Só bordas**: filtra a bandeja. **Espiar**: imagem inteira.
+- Recorde por tempo. Progresso salvo em `alith-jigsaw-v1` (aceite do 18+ é compartilhado com o deslizante).
+
+| Cap. | Peças (C×R) |
+|---|---|
+| I | 3×4 = 12 |
+| II | 4×5 = 20 |
+| III | 5×7 = 35 |
+| IV | 6×8 = 48 |
+| V | 7×10 = 70 |
+
 ## Decisões
 - 2026-11-07: HTML único e local, por ser arte de terceiro com nudez.
 - 2026-11-07: repositório privado no GitHub, compartilhado só com Mark666DooM. Sem GitHub Pages: o site do Pages seria público. Para jogar, baixar o `alith-puzzle.html` e abrir no navegador.
@@ -43,3 +56,4 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 - 2026-11-07: versão PWA gerada pelo mesmo build. Para manter o acesso só entre os dois, a hospedagem precisa de login (ex.: Cloudflare Pages + Cloudflare Access), não link público.
 - 2026-11-07: Erick escolheu não hospedar; no celular o jogo é aberto como arquivo. Recordes podem não persistir quando aberto como arquivo.
 - 2026-11-07: repositório tornado público e GitHub Pages ligado, temporariamente, a pedido do Erick para testar no celular. Para encerrar: Settings → Pages → desligar e voltar a visibilidade para privado.
+- 2026-11-07: criada a versão de encaixe (jigsaw), com mesmos capítulos e textos; os dois jogos têm link um para o outro. PWA v1.2.0.

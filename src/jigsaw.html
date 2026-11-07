@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alith · Encaixe</title>
+__PWA_HEAD__
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0710; --bg2:#160d1d; --ink:#efe4f2; --muted:#a893b0;
+  --rose:#ff4f8b; --blood:#9b0f25; --teal:#36c9c6; --violet:#8f5cc2; --peach:#ffb38a;
+  --line:rgba(255,255,255,.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(ellipse 60% 45% at 15% 20%, rgba(54,201,198,.13), transparent 70%),
+    radial-gradient(ellipse 55% 50% at 90% 85%, rgba(255,79,139,.16), transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 50%, var(--bg2), var(--bg));
+  background-color:var(--bg);
+  color:var(--ink);
+  font-family:"Cormorant Garamond", Georgia, serif;
+  font-size:18px;
+  min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;user-select:none;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:var(--teal)}
+.wrap{max-width:1100px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:10px}
+
+header{text-align:center}
+h1{
+  font-family:Cinzel, serif;font-weight:700;letter-spacing:.14em;
+  font-size:clamp(20px,4.6vw,30px);
+  background:linear-gradient(180deg,#f6e9ff 0%, #d9a6e6 55%, var(--rose) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sub{color:var(--muted);font-style:italic;font-size:15px}
+.sub a{font-size:14px;margin-left:6px}
+
+.chapters{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ch{
+  font-family:Cinzel,serif;font-size:13px;letter-spacing:.08em;
+  padding:6px 12px;border:1px solid var(--line);border-radius:999px;
+  background:rgba(255,255,255,.03);transition:.2s;min-width:44px;
+}
+.ch:hover:not(:disabled){border-color:rgba(255,79,139,.5)}
+.ch.on{border-color:var(--rose);background:rgba(255,79,139,.14);box-shadow:0 0 16px rgba(255,79,139,.25)}
+.ch:disabled{opacity:.35;cursor:not-allowed}
+.ch .done{color:var(--teal);margin-left:4px}
+
+.title-ch{font-family:Cinzel,serif;font-size:14px;letter-spacing:.18em;color:var(--peach);text-align:center}
+.title-ch small{font-family:"Cormorant Garamond",serif;letter-spacing:0;color:var(--muted);font-style:italic;font-size:15px;margin-left:6px}
+
+.stats{display:flex;gap:16px;font-size:15px;color:var(--muted)}
+.stats b{color:var(--ink);font-family:Cinzel,serif;font-weight:500;font-size:15px;margin-left:4px}
+
+/* área do jogo */
+.game{display:flex;gap:12px;align-items:flex-start;justify-content:center;width:100%}
+.game.col{flex-direction:column;align-items:center}
+.boardwrap{position:relative;flex:none}
+.progress{height:4px;border-radius:2px;background:rgba(255,255,255,.08);margin-bottom:6px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blood),var(--rose));transition:width .3s;box-shadow:0 0 10px var(--rose)}
+.board{
+  position:relative;border-radius:6px;overflow:visible;
+  box-shadow:0 0 0 1px rgba(255,79,139,.35), 0 0 40px rgba(255,79,139,.16);
+}
+.board canvas.bg{position:absolute;inset:0;border-radius:6px}
+.board .peek{position:absolute;inset:0;border-radius:6px;background-size:100% 100%;opacity:0;transition:opacity .2s;pointer-events:none;z-index:5}
+.board.peeking .peek{opacity:.95}
+.layer{position:absolute;inset:0;pointer-events:none}
+.piece{position:absolute;display:block}
+.piece.snap{animation:snap .5s ease-out}
+@keyframes snap{0%{filter:brightness(1.8) drop-shadow(0 0 10px var(--rose))}100%{filter:none}}
+.board.done{animation:glow 1.6s ease-out}
+@keyframes glow{0%{box-shadow:0 0 0 1px var(--rose),0 0 90px rgba(255,79,139,.7)}100%{box-shadow:0 0 0 1px rgba(255,79,139,.35),0 0 40px rgba(255,79,139,.16)}}
+
+.tray{
+  flex:none;border-radius:6px;padding:8px;
+  background:linear-gradient(180deg,#1d1026,#130a19);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07), inset 0 0 30px rgba(0,0,0,.5);
+  display:flex;gap:6px;
+  scrollbar-width:thin;scrollbar-color:#5a3a66 transparent;
+}
+.tray.v{flex-direction:column;overflow-y:auto;overflow-x:hidden;align-items:center}
+.tray.h{flex-direction:row;overflow-x:auto;overflow-y:hidden;align-items:center}
+.slot{flex:none;display:flex;align-items:center;justify-content:center;cursor:grab;border-radius:4px}
+.tray.v .slot{touch-action:pan-y}
+.tray.h .slot{touch-action:pan-x}
+.slot:hover{background:rgba(255,255,255,.04)}
+.slot canvas{pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6))}
+.slot.out{visibility:hidden}
+.slot.hide{display:none}
+.slot.back{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.tray .empty{color:var(--muted);font-style:italic;font-size:14px;padding:8px;text-align:center}
+
+#drag{position:fixed;left:0;top:0;z-index:20;pointer-events:none;will-change:transform;
+  filter:drop-shadow(0 10px 14px rgba(0,0,0,.7)) drop-shadow(0 0 8px rgba(255,79,139,.35))}
+
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn{
+  font-family:Cinzel,serif;font-size:13px;letter-spacing:.1em;
+  padding:9px 14px;border-radius:4px;border:1px solid var(--line);
+  background:rgba(255,255,255,.04);transition:.15s;
+}
+.btn:hover{border-color:rgba(255,255,255,.25)}
+.btn.primary{border-color:var(--blood);background:linear-gradient(180deg,#b3173a,#6d0a1b);box-shadow:0 0 18px rgba(155,15,37,.4)}
+.btn[aria-pressed="true"]{border-color:var(--teal);color:var(--teal)}
+.hint{font-size:14px;color:var(--muted);font-style:italic;text-align:center}
+footer{font-size:13px;color:var(--muted);opacity:.7;text-align:center}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:30;display:none;background:rgba(6,3,9,.86);backdrop-filter:blur(6px);overflow-y:auto;padding:24px 16px}
+.ov.show{display:flex;align-items:flex-start;justify-content:center}
+.card{margin:auto;max-width:720px;width:100%;border:1px solid rgba(255,79,139,.3);border-radius:8px;background:linear-gradient(180deg,#1a0f22,#0e0813);box-shadow:0 0 60px rgba(155,15,37,.35);padding:22px;-webkit-user-select:text;user-select:text}
+.gate{text-align:center;max-width:460px}
+.gate .age{display:inline-block;font-family:Cinzel,serif;font-size:30px;font-weight:700;border:2px solid var(--blood);color:var(--rose);border-radius:6px;padding:2px 14px;margin-bottom:12px}
+.gate p{margin:10px 0;color:#d7c6dd}
+.gate .row{display:flex;gap:10px;justify-content:center;margin-top:16px}
+.win{display:grid;grid-template-columns:minmax(0,240px) 1fr;gap:20px;align-items:start}
+.win img{width:100%;border-radius:6px;box-shadow:0 0 30px rgba(255,79,139,.35);display:block}
+.win h2{font-family:Cinzel,serif;font-size:22px;letter-spacing:.12em;color:var(--peach)}
+.win .kicker{font-family:Cinzel,serif;font-size:12px;letter-spacing:.2em;color:var(--rose)}
+.win .lore p{margin:10px 0;line-height:1.45;color:#e2d4e7}
+.win blockquote{margin:14px 0;padding:8px 14px;border-left:2px solid var(--blood);font-style:italic;color:var(--peach)}
+.win .res{font-size:15px;color:var(--muted);margin:8px 0 14px}
+.win .res b{color:var(--ink)}
+.win .new{color:var(--teal);font-family:Cinzel,serif;font-size:12px;letter-spacing:.12em;margin-left:6px}
+.win .row{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:600px){.win{grid-template-columns:1fr}.win img{max-width:220px;margin:0 auto}}
+.drip{height:10px;margin:-22px -22px 14px;border-radius:8px 8px 0 0;
+  background:
+    radial-gradient(circle at 10% 0, var(--blood) 6px, transparent 7px),
+    radial-gradient(circle at 31% 0, var(--blood) 9px, transparent 10px),
+    radial-gradient(circle at 57% 0, var(--blood) 5px, transparent 6px),
+    radial-gradient(circle at 78% 0, var(--blood) 8px, transparent 9px),
+    linear-gradient(var(--blood),var(--blood)) top/100% 3px no-repeat}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>ALITH YNGVIRLD</h1>
+    <div class="sub">o encaixe das cicatrizes <a href="__OTHER__">↔ versão deslizante</a></div>
+  </header>
+
+  <nav class="chapters" id="chapters" aria-label="Capítulos"></nav>
+  <div class="title-ch" id="chTitle"></div>
+
+  <div class="stats">
+    <span>Peças<b id="sCount">0/0</b></span>
+    <span>Tempo<b id="sTime">0:00</b></span>
+    <span>Recorde<b id="sBest">—</b></span>
+  </div>
+
+  <div class="game" id="game">
+    <div class="boardwrap" id="boardwrap">
+      <div class="progress"><i id="prog"></i></div>
+      <div class="board" id="board">
+        <canvas class="bg" id="bg"></canvas>
+        <div class="layer" id="layer"></div>
+        <div class="peek" id="peek"></div>
+      </div>
+    </div>
+    <div class="tray" id="tray"></div>
+  </div>
+
+  <div class="controls" id="controls">
+    <button class="btn primary" id="bRestart">Recomeçar</button>
+    <button class="btn" id="bPeek">Espiar (segure)</button>
+    <button class="btn" id="bGhost" aria-pressed="true">Sombra</button>
+    <button class="btn" id="bEdges" aria-pressed="false">Só bordas</button>
+  </div>
+  <div class="hint" id="hint"></div>
+  <footer>Arte: @marknogart · Uso pessoal</footer>
+</div>
+
+<canvas id="drag" hidden></canvas>
+
+<div class="ov" id="gate">
+  <div class="card gate">
+    <div class="drip"></div>
+    <div class="age">18+</div>
+    <p><b>Conteúdo adulto.</b> Nudez sugerida, sangue e temas sombrios.</p>
+    <p style="font-style:italic;color:var(--muted)">"Basta saber de qual lado da batalha você escolhe estar, junto ou contra."</p>
+    <div class="row">
+      <button class="btn primary" id="gYes">Tenho 18 anos ou mais</button>
+      <button class="btn" id="gNo">Sair</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="winOv">
+  <div class="card">
+    <div class="drip"></div>
+    <div class="win">
+      <img id="wImg" alt="Alith Yngvirld">
+      <div>
+        <div class="kicker" id="wKick"></div>
+        <h2 id="wTitle"></h2>
+        <div class="res" id="wRes"></div>
+        <div class="lore" id="wLore"></div>
+        <div class="row" id="wBtns"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const IMG = "__IMG__";
+
+const CHAPTERS = [
+  { n:"I", t:"Aletheia", s:"o nome escolhido", c:3, r:4,
+    lore:[
+      "Ela não se lembra do nome com que nasceu. Então escolheu um.",
+      "<b>Alith</b>, de <i>Aletheia</i>: o não-oculto, o não-escondido, o não-dissimulado. A verdade é aquilo que se mostra como é, aos olhos do corpo e do espírito.",
+      "E ela nunca se escondeu de ninguém."
+    ],
+    quote:"A verdade é a manifestação daquilo que é, tal como é." },
+  { n:"II", t:"Yngvihildr", s:"paz e guerra no mesmo sangue", c:4, r:5,
+    lore:[
+      "<b>Yngvi</b> é o nome mais antigo de Freyr, irmão gêmeo de Freyja: colheita, fertilidade, casamento, alegria e paz.",
+      "<b>Hildr</b> é a batalha. A palavra que o tempo arrastou até virar <i>hell</i>.",
+      "Yngvihildr. Yngvirld. A origem, a história e tudo o que ela atravessou para continuar de pé."
+    ],
+    quote:"Uma adaptação entre a origem, a história e a sua superação." },
+  { n:"III", t:"A Voz", s:"dois metros e dez de aço", c:5, r:7,
+    lore:[
+      "Dois metros e dez. Uns cento e vinte quilos, se alguém um dia a visse sem armadura. Ninguém viu.",
+      "Aparenta entre quarenta e cinquenta anos. Deve estar perto dos cento e cinquenta. Ela não confirma.",
+      "Mas o que rende os homens não é o tamanho. É a voz: madura, aveludada, agridoce. Uma dança estreita entre o medo e a inspiração."
+    ],
+    quote:"Basta saber de qual lado da batalha você escolhe estar: junto, ou contra." },
+  { n:"IV", t:"As Cicatrizes", s:"espólios que não se contam", c:6, r:8,
+    lore:[
+      "Ela coleciona o que conquista. Às vezes num baú. Sempre na memória.",
+      "Busca a verdade e o bem, mesmo quando o preço é sangue, o dela ou o de quem estiver no caminho.",
+      "Prende o cabelo em trança para que ninguém deixe de ver as cicatrizes do rosto. Tem orgulho delas. Nunca disse como as ganhou."
+    ],
+    quote:"Em algum lugar da sua história alguém as conheceu. Nunca saberemos quem." },
+  { n:"V", t:"A Paladina", s:"a lua cheia na noite mais escura", c:7, r:10,
+    lore:[
+      "Paladina de Atraídes. Os votos dela vão para o bem maior e para a verdade, acima de deuses presos à ordem e ao caos.",
+      "Esqueceu boa parte da vida: a infância, os traços que a moldaram, talvez o caminho de casa. Uma casa no campo, um horizonte com ilhas ao fundo. Nunca voltou.",
+      "Por ora coleciona vitórias. Lembrar seria só mais um espólio."
+    ],
+    quote:"Os objetivos são claros como a luz da lua cheia, dentro da mais escura noite." }
+];
+const EPILOGUE = "Para quem já dormiu com as estrelas como único teto, é fácil viver com o minimalismo da realidade. Ela segue firme.";
+
+/* ---------- persistência ---------- */
+const KEY = "alith-jigsaw-v1";
+function load(k){ try{ return JSON.parse(localStorage.getItem(k)) || {}; }catch(e){ return {}; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} }
+const store = Object.assign({ unlocked:1, best:{}, adult:false, ghost:true }, load(KEY));
+if(load("alith-puzzle-v1").adult) store.adult = true;
+
+/* ---------- estado ---------- */
+const $ = id => document.getElementById(id);
+const DPR = Math.min(window.devicePixelRatio || 1, 2);
+const image = new Image();
+let IW = 0, IH = 0;
+let ch = 0, C = 3, R = 4, pw = 0, ph = 0, T = 0, pieces = [];
+let scale = 1, horizontal = false, slotSize = 90;
+let placed = 0, elapsed = 0, t0 = 0, timer = null, playing = false, misses = 0, peeks = 0;
+let edgesOnly = false;
+
+function fmt(s){ const m = Math.floor(s/60); return m + ":" + String(s%60).padStart(2,"0"); }
+
+/* ---------- geometria das peças ---------- */
+function side(ctx, x0, y0, x1, y1, s){
+  if(!s){ ctx.lineTo(x1, y1); return; }
+  const dx = x1-x0, dy = y1-y0, L = Math.hypot(dx, dy);
+  const nx = dy/L, ny = -dx/L, k = Math.min(pw, ph) * s;
+  const P = (u, v) => [x0 + dx*u + nx*v*k, y0 + dy*u + ny*v*k];
+  ctx.lineTo(...P(.36, 0));
+  ctx.bezierCurveTo(...P(.42, 0), ...P(.43, .06), ...P(.40, .12));
+  ctx.bezierCurveTo(...P(.35, .22), ...P(.43, .28), ...P(.50, .28));
+  ctx.bezierCurveTo(...P(.57, .28), ...P(.65, .22), ...P(.60, .12));
+  ctx.bezierCurveTo(...P(.57, .06), ...P(.58, 0), ...P(.64, 0));
+  ctx.lineTo(x1, y1);
+}
+function path(ctx, p, ox, oy){
+  ctx.beginPath(); ctx.moveTo(ox, oy);
+  side(ctx, ox, oy, ox+pw, oy, p.sides[0]);
+  side(ctx, ox+pw, oy, ox+pw, oy+ph, p.sides[1]);
+  side(ctx, ox+pw, oy+ph, ox, oy+ph, p.sides[2]);
+  side(ctx, ox, oy+ph, ox, oy, p.sides[3]);
+  ctx.closePath();
+}
+
+function drawPiece(p, cv){
+  const W = pw + 2*T, H = ph + 2*T, s = scale * DPR;
+  cv.width = Math.ceil(W * s); cv.height = Math.ceil(H * s);
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(s, 0, 0, s, 0, 0);
+  path(ctx, p, T, T);
+  ctx.save(); ctx.clip();
+  ctx.drawImage(image, T - p.col*pw, T - p.row*ph, IW, IH);
+  // relevo interno
+  ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = 6 * DPR;
+  ctx.lineWidth = 3/scale; ctx.strokeStyle = "rgba(0,0,0,.35)"; path(ctx, p, T, T); ctx.stroke();
+  ctx.restore();
+  ctx.lineWidth = 1.4/scale; ctx.strokeStyle = "rgba(255,255,255,.28)"; path(ctx, p, T, T); ctx.stroke();
+  ctx.lineWidth = .7/scale; ctx.strokeStyle = "rgba(0,0,0,.7)"; path(ctx, p, T, T); ctx.stroke();
+}
+
+function drawBoard(){
+  const cv = $("bg"), s = scale * DPR;
+  cv.width = Math.round(IW*s); cv.height = Math.round(IH*s);
+  cv.style.width = IW*scale + "px"; cv.style.height = IH*scale + "px";
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(s, 0, 0, s, 0, 0);
+  const g = ctx.createLinearGradient(0, 0, 0, IH);
+  g.addColorStop(0, "#2a1534"); g.addColorStop(1, "#1a0c22");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, IW, IH);
+  if(store.ghost){ ctx.globalAlpha = .16; ctx.drawImage(image, 0, 0, IW, IH); ctx.globalAlpha = 1; }
+  for(const p of pieces){
+    path(ctx, p, p.col*pw + 1/scale, p.row*ph + 1/scale);
+    ctx.lineWidth = 1/scale; ctx.strokeStyle = "rgba(0,0,0,.55)"; ctx.stroke();
+    path(ctx, p, p.col*pw, p.row*ph);
+    ctx.strokeStyle = "rgba(255,180,230,.16)"; ctx.stroke();
+  }
+}
+
+/* ---------- layout ---------- */
+function layout(){
+  const wrapW = Math.min(document.querySelector(".wrap").clientWidth - 32, 1068);
+  horizontal = window.innerWidth < 760 || window.innerHeight > window.innerWidth;
+  const game = $("game"), tray = $("tray");
+  game.classList.toggle("col", horizontal);
+  tray.className = "tray " + (horizontal ? "h" : "v");
+  const top = $("boardwrap").getBoundingClientRect().top + window.scrollY;
+  const below = $("controls").offsetHeight + $("hint").offsetHeight + 40;
+  const trayH = horizontal ? 104 : 0, trayW = horizontal ? 0 : 150;
+  const availW = wrapW - (horizontal ? 0 : trayW + 12);
+  const availH = Math.max(240, window.innerHeight - top - below - trayH - 22);
+  const bw = Math.min(availW, availH * IW/IH, 620);
+  scale = bw / IW;
+  const board = $("board");
+  board.style.width = IW*scale + "px"; board.style.height = IH*scale + "px";
+  if(horizontal){ tray.style.width = bw + "px"; tray.style.height = trayH + "px"; slotSize = 88; }
+  else{ tray.style.width = trayW + "px"; tray.style.height = (IH*scale + 10) + "px"; slotSize = 120; }
+}
+
+function positionPlaced(p){
+  const el = p.cv;
+  el.style.left = (p.col*pw - T)*scale + "px";
+  el.style.top = (p.row*ph - T)*scale + "px";
+  el.style.width = (pw + 2*T)*scale + "px";
+  el.style.height = (ph + 2*T)*scale + "px";
+}
+function sizeInTray(p){
+  const W = pw + 2*T, H = ph + 2*T, f = (slotSize - 8) / Math.max(W, H);
+  p.cv.style.width = W*f + "px"; p.cv.style.height = H*f + "px";
+}
+
+function rerender(){
+  layout(); drawBoard();
+  for(const p of pieces){
+    drawPiece(p, p.cv);
+    if(p.placed) positionPlaced(p); else sizeInTray(p);
+    if(p.slot){ p.slot.style.width = p.slot.style.height = slotSize + "px"; }
+  }
+}
+
+/* ---------- partida ---------- */
+function renderChapters(){
+  const nav = $("chapters"); nav.innerHTML = "";
+  CHAPTERS.forEach((c,i)=>{
+    const b = document.createElement("button");
+    b.className = "ch" + (i===ch ? " on" : "");
+    b.disabled = i >= store.unlocked;
+    b.title = b.disabled ? "Bloqueado" : `${c.t} (${c.c*c.r} peças)`;
+    b.innerHTML = (b.disabled ? "🔒 " : "") + c.n + (store.best[i] ? '<span class="done">✦</span>' : "");
+    b.onclick = () => { if(!b.disabled){ ch = i; start(); } };
+    nav.appendChild(b);
+  });
+}
+
+function start(){
+  const c = CHAPTERS[ch];
+  C = c.c; R = c.r; pw = IW / C; ph = IH / R; T = Math.min(pw, ph) * .3;
+  stopTimer(); elapsed = 0; placed = 0; misses = 0; peeks = 0; playing = true;
+  $("board").classList.remove("done");
+  $("chTitle").innerHTML = `CAPÍTULO ${c.n} · ${c.t.toUpperCase()}<small>${C*R} peças</small>`;
+
+  const rnd = () => Math.random() < .5 ? 1 : -1;
+  const hE = [], vE = [];
+  for(let r=0;r<=R;r++){ hE[r]=[]; for(let q=0;q<C;q++) hE[r][q] = (r===0||r===R) ? 0 : rnd(); }
+  for(let r=0;r<R;r++){ vE[r]=[]; for(let q=0;q<=C;q++) vE[r][q] = (q===0||q===C) ? 0 : rnd(); }
+
+  pieces = [];
+  for(let r=0;r<R;r++) for(let q=0;q<C;q++){
+    const sides = [ -hE[r][q], vE[r][q+1], hE[r+1][q], -vE[r][q] ];
+    const cv = document.createElement("canvas");
+    pieces.push({ id:pieces.length, row:r, col:q, sides, placed:false, cv, slot:null,
+                  edge: sides.some(s => s === 0) });
+  }
+
+  $("layer").innerHTML = "";
+  const tray = $("tray"); tray.innerHTML = "";
+  layout(); drawBoard();
+  const order = pieces.slice().sort(() => Math.random() - .5);
+  for(const p of order){
+    drawPiece(p, p.cv);
+    const slot = document.createElement("div");
+    slot.className = "slot";
+    slot.style.width = slot.style.height = slotSize + "px";
+    sizeInTray(p);
+    slot.appendChild(p.cv);
+    slot.addEventListener("pointerdown", e => grab(e, p));
+    p.slot = slot;
+    tray.appendChild(slot);
+  }
+  applyEdgeFilter();
+  $("hint").textContent = horizontal
+    ? "Arraste as peças da bandeja para cima, até o lugar delas. Deslize a bandeja para os lados para ver mais."
+    : "Arraste as peças da bandeja até o lugar delas no tabuleiro.";
+  updStats(); renderChapters();
+}
+
+function applyEdgeFilter(){
+  let shown = 0;
+  for(const p of pieces){
+    if(!p.slot) continue;
+    const hide = edgesOnly && !p.edge;
+    p.slot.classList.toggle("hide", hide || p.placed);
+    if(!hide && !p.placed) shown++;
+  }
+  const tray = $("tray");
+  let msg = tray.querySelector(".empty");
+  if(!shown && playing){
+    if(!msg){ msg = document.createElement("div"); msg.className = "empty"; tray.appendChild(msg); }
+    msg.textContent = "Bordas completas. Desligue “Só bordas”.";
+  } else if(msg) msg.remove();
+}
+
+function updStats(){
+  $("sCount").textContent = `${placed}/${C*R}`;
+  $("sTime").textContent = fmt(elapsed);
+  const b = store.best[ch];
+  $("sBest").textContent = b ? fmt(b.time) : "—";
+  $("prog").style.width = (placed / (C*R) * 100) + "%";
+}
+function startTimer(){
+  if(timer) return;
+  t0 = Date.now() - elapsed*1000;
+  timer = setInterval(()=>{ elapsed = Math.floor((Date.now()-t0)/1000); updStats(); }, 250);
+}
+function stopTimer(){ clearInterval(timer); timer = null; }
+
+/* ---------- arrastar ---------- */
+const dragCv = $("drag");
+let drag = null;
+
+function grab(e, p){
+  if(!playing || p.placed || drag) return;
+  drag = { p, id:e.pointerId, sx:e.clientX, sy:e.clientY, started:false,
+           lift: e.pointerType === "touch" ? 46 : 0 };
+}
+window.addEventListener("pointermove", e=>{
+  if(!drag || e.pointerId !== drag.id) return;
+  if(!drag.started){
+    if(Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 6) return;
+    drag.started = true; startTimer();
+    const p = drag.p, W = (pw + 2*T)*scale, H = (ph + 2*T)*scale;
+    drawPiece(p, dragCv);
+    dragCv.style.width = W + "px"; dragCv.style.height = H + "px";
+    drag.ox = W/2; drag.oy = H/2 + drag.lift;
+    dragCv.hidden = false;
+    p.slot.classList.add("out");
+  }
+  e.preventDefault();
+  dragCv.style.transform = `translate(${e.clientX - drag.ox}px, ${e.clientY - drag.oy}px)`;
+}, { passive:false });
+
+function endDrag(e, cancel){
+  if(!drag || e.pointerId !== drag.id) return;
+  const d = drag; drag = null;
+  if(!d.started) return;
+  dragCv.hidden = true;
+  const p = d.p;
+  if(!cancel){
+    const br = $("board").getBoundingClientRect();
+    const x = (e.clientX - d.ox - br.left)/scale + T;    // canto da peça, em pixels da imagem
+    const y = (e.clientY - d.oy - br.top)/scale + T;
+    const err = Math.hypot(x - p.col*pw, y - p.row*ph);
+    if(err < Math.min(pw, ph) * .32){ place(p); return; }
+    const over = e.clientX >= br.left && e.clientX <= br.right && e.clientY >= br.top && e.clientY <= br.bottom;
+    if(over) misses++;
+  }
+  p.slot.classList.remove("out");
+  p.slot.classList.remove("back"); void p.slot.offsetWidth; p.slot.classList.add("back");
+}
+window.addEventListener("pointerup", e => endDrag(e, false));
+window.addEventListener("pointercancel", e => endDrag(e, true));
+
+function place(p){
+  p.placed = true; placed++;
+  p.slot.remove(); p.slot = null;
+  positionPlaced(p);
+  $("layer").appendChild(p.cv);
+  p.cv.className = "piece snap";
+  if(navigator.vibrate) try{ navigator.vibrate(12); }catch(e){}
+  applyEdgeFilter(); updStats();
+  if(placed === C*R) win();
+}
+
+/* ---------- vitória ---------- */
+function win(){
+  playing = false; stopTimer();
+  $("board").classList.add("done");
+  const prev = store.best[ch];
+  const isNew = !prev || elapsed < prev.time;
+  if(isNew) store.best[ch] = { time: elapsed };
+  const firstClear = store.unlocked === ch+1 && ch+1 < CHAPTERS.length;
+  if(store.unlocked < ch+2) store.unlocked = Math.min(CHAPTERS.length, ch+2);
+  save(); renderChapters(); updStats();
+  setTimeout(()=>showWin(isNew, firstClear), 1100);
+}
+function showWin(isNew, firstClear){
+  const c = CHAPTERS[ch], lastCh = ch === CHAPTERS.length-1;
+  $("wKick").textContent = `CAPÍTULO ${c.n} REVELADO`;
+  $("wTitle").textContent = c.t;
+  $("wRes").innerHTML = `<b>${C*R}</b> peças em <b>${fmt(elapsed)}</b>` +
+    (misses ? ` · ${misses} erro${misses>1?"s":""}` : " · sem erros") +
+    (peeks ? ` · espiou ${peeks}×` : "") + (isNew ? '<span class="new">NOVO RECORDE</span>' : "");
+  $("wLore").innerHTML = c.lore.map(p=>`<p>${p}</p>`).join("") +
+    `<blockquote>“${c.quote}”</blockquote>` +
+    (lastCh ? `<p style="color:var(--peach)">${EPILOGUE}</p>` : "") +
+    (firstClear ? `<p style="color:var(--teal);font-size:15px">Capítulo ${CHAPTERS[ch+1].n} desbloqueado.</p>` : "");
+  const btns = $("wBtns"); btns.innerHTML = "";
+  const mk = (txt, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = txt; b.onclick = fn; btns.appendChild(b); };
+  if(!lastCh) mk("Próximo capítulo", "primary", ()=>{ closeWin(); ch++; start(); });
+  mk("Jogar de novo", lastCh ? "primary" : "", ()=>{ closeWin(); start(); });
+  mk("Contemplar", "", closeWin);
+  $("winOv").classList.add("show");
+}
+function closeWin(){ $("winOv").classList.remove("show"); }
+
+/* ---------- controles ---------- */
+function peek(on){
+  if(on && !$("board").classList.contains("peeking") && playing) peeks++;
+  $("board").classList.toggle("peeking", on);
+}
+const bp = $("bPeek");
+bp.addEventListener("pointerdown", e=>{ e.preventDefault(); peek(true); });
+["pointerup","pointerleave","pointercancel"].forEach(ev=>bp.addEventListener(ev, ()=>peek(false)));
+bp.addEventListener("contextmenu", e=>e.preventDefault());
+document.addEventListener("keydown", e=>{
+  if(e.key === " " && !$("gate").classList.contains("show")){ e.preventDefault(); if(!e.repeat) peek(true); }
+  if(e.key === "Escape") closeWin();
+});
+document.addEventListener("keyup", e=>{ if(e.key === " ") peek(false); });
+
+$("bRestart").onclick = start;
+function setGhost(v){ store.ghost = v; save(); $("bGhost").setAttribute("aria-pressed", v); if(pieces.length) drawBoard(); }
+$("bGhost").onclick = ()=> setGhost(!store.ghost);
+$("bEdges").onclick = ()=>{ edgesOnly = !edgesOnly; $("bEdges").setAttribute("aria-pressed", edgesOnly); applyEdgeFilter(); };
+
+let rt = null;
+window.addEventListener("resize", ()=>{ clearTimeout(rt); rt = setTimeout(()=>{ if(pieces.length) rerender(); }, 150); });
+
+/* ---------- portão 18+ ---------- */
+$("gYes").onclick = ()=>{ store.adult = true; save(); $("gate").classList.remove("show"); };
+$("gNo").onclick = ()=>{ document.body.innerHTML = '<p style="padding:40px;text-align:center;color:#a893b0;font-style:italic">Volte quando estiver pronto.</p>'; };
+if(!store.adult) $("gate").classList.add("show");
+
+$("peek").style.backgroundImage = `url(${IMG})`;
+$("wImg").src = IMG;
+image.onload = ()=>{
+  IW = image.naturalWidth; IH = image.naturalHeight;
+  setGhost(store.ghost);
+  ch = Math.max(0, store.unlocked - 1);
+  start();
+};
+image.src = IMG;
+__PWA_SW__
+</script>
+</body>
+</html>
