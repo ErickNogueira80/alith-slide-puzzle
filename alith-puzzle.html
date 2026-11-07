@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Alith Yngvirld</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
@@ -40,7 +41,7 @@ body::before{ /* poeira de estrelas */
     radial-gradient(1px 1px at 58% 40%, #fff3, transparent);
 }
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-.wrap{max-width:980px;margin:0 auto;padding:14px 16px 28px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.wrap{max-width:980px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:12px}
 
 header{text-align:center}
 h1{
@@ -493,6 +494,7 @@ if(!store.adult) $("gate").classList.add("show");
 
 ch = Math.max(0, store.unlocked - 1);
 start();
+
 </script>
 </body>
 </html>
