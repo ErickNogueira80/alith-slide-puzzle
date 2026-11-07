@@ -10,7 +10,8 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 
 ## Onde está
 - Pasta: `D:\Erick\Jogos\alith-slide-puzzle`
-- Repositório: https://github.com/ErickNogueira80/alith-slide-puzzle (**privado**; acesso só do Erick e de Mark666DooM, convidado como colaborador, que em conta pessoal sempre tem escrita)
+- Repositório: https://github.com/ErickNogueira80/alith-slide-puzzle (**PÚBLICO temporariamente** desde 2026-11-07 para teste no celular; Erick vai voltar para privado. Colaborador: Mark666DooM)
+- Jogo online (temporário): https://ericknogueira80.github.io/alith-slide-puzzle/app/ (GitHub Pages; some ao voltar para privado)
 - Jogo pronto: `alith-puzzle.html` (arquivo único, imagem embutida; abre em qualquer navegador e no celular)
 - PWA: pasta `app/` (index.html, manifest, service worker offline, ícones). Só instala servida por HTTPS; hoje **não hospedado** (decisão de 2026-11-07), fica pronta para o futuro.
 - Fontes: `src/template.html` (código) + `src/alith.png` (arte original)
@@ -41,3 +42,4 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 - Textos dos capítulos adaptados do background da personagem escrito pelo Erick.
 - 2026-11-07: versão PWA gerada pelo mesmo build. Para manter o acesso só entre os dois, a hospedagem precisa de login (ex.: Cloudflare Pages + Cloudflare Access), não link público.
 - 2026-11-07: Erick escolheu não hospedar; no celular o jogo é aberto como arquivo. Recordes podem não persistir quando aberto como arquivo.
+- 2026-11-07: repositório tornado público e GitHub Pages ligado, temporariamente, a pedido do Erick para testar no celular. Para encerrar: Settings → Pages → desligar e voltar a visibilidade para privado.
