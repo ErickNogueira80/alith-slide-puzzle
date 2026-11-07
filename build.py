@@ -1,29 +1,37 @@
 """Gera os jogos a partir de src/:
-- alith-puzzle.html / alith-jigsaw.html : arquivos únicos para abrir direto no navegador
-- app/ (index.html = deslizante, jigsaw.html = encaixe) : versão PWA (instalável por HTTPS)
+- alith-puzzle.html / alith-jigsaw.html / alith-veu.html : arquivos únicos para abrir direto no navegador
+- app/ (index.html = deslizante, jigsaw.html = encaixe, veu.html = O Véu) : versão PWA (instalável por HTTPS)
 """
 import base64, io, json, pathlib
 from PIL import Image
 
 root = pathlib.Path(__file__).parent
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 
 img = Image.open(root / "src" / "alith.png").convert("RGB")
 buf = io.BytesIO()
 img.save(buf, "JPEG", quality=90, optimize=True, progressive=True)
 data = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
-# (template, arquivo avulso, página no PWA)
-GAMES = [("template.html", "alith-puzzle.html", "index.html"),
-         ("jigsaw.html", "alith-jigsaw.html", "jigsaw.html")]
-tpls = {src: (root / "src" / src).read_text(encoding="utf-8").replace("__IMG__", data) for src, _, _ in GAMES}
+# (template, arquivo avulso, página no PWA, nome no menu)
+GAMES = [("template.html", "alith-puzzle.html", "index.html", "Deslizante"),
+         ("jigsaw.html", "alith-jigsaw.html", "jigsaw.html", "Encaixe"),
+         ("veu.html", "alith-veu.html", "veu.html", "O Véu")]
+tpls = {g[0]: (root / "src" / g[0]).read_text(encoding="utf-8").replace("__IMG__", data) for g in GAMES}
 
-def other(i, k):  # link para o outro jogo
-    return GAMES[1 - i][k]
+def menu(i, k):  # navegação entre os jogos; k = 1 (avulso) ou 2 (PWA)
+    items = []
+    for j, g in enumerate(GAMES):
+        if j == i:
+            items.append(f'<b style="color:#ffb38a;font-weight:600">{g[3]}</b>')
+        else:
+            items.append(f'<a href="{g[k]}" style="color:#36c9c6">{g[3]}</a>')
+    sep = ' <span style="opacity:.4">·</span> '
+    return f'<nav style="font-size:15px;margin-top:4px">{sep.join(items)}</nav>'
 
 # 1) arquivos únicos
-for i, (src, single, _) in enumerate(GAMES):
+for i, (src, single, _, _) in enumerate(GAMES):
     (root / single).write_text(tpls[src].replace("__PWA_HEAD__", "").replace("__PWA_SW__", "")
-                               .replace("__OTHER__", other(i, 1)), encoding="utf-8")
+                               .replace("__GAMES__", menu(i, 1)), encoding="utf-8")
 
 # 2) PWA
 app = root / "app"; (app / "icons").mkdir(parents=True, exist_ok=True)
@@ -48,9 +56,9 @@ head = """<meta name="theme-color" content="#0b0710">
 sw_reg = """if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }"""
-for i, (src, _, page) in enumerate(GAMES):
+for i, (src, _, page, _) in enumerate(GAMES):
     (app / page).write_text(tpls[src].replace("__PWA_HEAD__", head).replace("__PWA_SW__", sw_reg)
-                            .replace("__OTHER__", other(i, 2)), encoding="utf-8")
+                            .replace("__GAMES__", menu(i, 2)), encoding="utf-8")
 
 manifest = {
     "name": "Alith Yngvirld",
@@ -72,7 +80,7 @@ manifest = {
 (app / "manifest.webmanifest").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
 sw = f"""const CACHE = 'alith-{VERSION}';
-const FILES = ['./', 'index.html', 'jigsaw.html', 'manifest.webmanifest',
+const FILES = ['./', 'index.html', 'jigsaw.html', 'veu.html', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 self.addEventListener('install', e => {{
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

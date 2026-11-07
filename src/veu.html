@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alith · O Véu</title>
+__PWA_HEAD__
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+Runic&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0710; --bg2:#160d1d; --ink:#efe4f2; --muted:#a893b0;
+  --rose:#ff4f8b; --blood:#9b0f25; --teal:#36c9c6; --violet:#8f5cc2; --peach:#ffb38a;
+  --line:rgba(255,255,255,.09);
+  --ar:0.7046;
+  --bw:min(92vw, 470px, calc((100dvh - 270px) * var(--ar)));
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:
+    radial-gradient(ellipse 60% 45% at 15% 20%, rgba(54,201,198,.13), transparent 70%),
+    radial-gradient(ellipse 55% 50% at 90% 85%, rgba(255,79,139,.16), transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 50%, var(--bg2), var(--bg));
+  background-color:var(--bg);
+  color:var(--ink);
+  font-family:"Cormorant Garamond", Georgia, serif;
+  font-size:18px;
+  min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;user-select:none;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.wrap{max-width:980px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:10px}
+
+header{text-align:center}
+h1{
+  font-family:Cinzel, serif;font-weight:700;letter-spacing:.14em;
+  font-size:clamp(20px,4.6vw,30px);
+  background:linear-gradient(180deg,#f6e9ff 0%, #d9a6e6 55%, var(--rose) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sub{color:var(--muted);font-style:italic;font-size:15px}
+
+.chapters{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ch{font-family:Cinzel,serif;font-size:13px;letter-spacing:.08em;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);transition:.2s;min-width:44px}
+.ch:hover:not(:disabled){border-color:rgba(255,79,139,.5)}
+.ch.on{border-color:var(--rose);background:rgba(255,79,139,.14);box-shadow:0 0 16px rgba(255,79,139,.25)}
+.ch:disabled{opacity:.35;cursor:not-allowed}
+.ch .done{color:var(--teal);margin-left:4px}
+
+.title-ch{font-family:Cinzel,serif;font-size:14px;letter-spacing:.18em;color:var(--peach);text-align:center}
+.title-ch small{font-family:"Cormorant Garamond",serif;letter-spacing:0;color:var(--muted);font-style:italic;font-size:15px;margin-left:6px}
+
+.stats{display:flex;gap:14px;font-size:15px;color:var(--muted);flex-wrap:wrap;justify-content:center}
+.stats b{color:var(--ink);font-family:Cinzel,serif;font-weight:500;font-size:15px;margin-left:4px}
+
+.board{
+  position:relative;width:var(--bw);height:calc(var(--bw) / var(--ar));
+  border-radius:6px;overflow:hidden;background-size:100% 100%;background-color:#07040a;
+  display:grid;touch-action:manipulation;
+  box-shadow:0 0 0 1px rgba(255,79,139,.35), 0 0 40px rgba(255,79,139,.18), 0 0 80px rgba(54,201,198,.08);
+}
+.cell{position:relative;cursor:pointer;outline:none}
+.cell::before{ /* o véu */
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(143,92,194,.38), transparent 62%),
+    radial-gradient(circle at 20% 90%, rgba(155,15,37,.35), transparent 55%),
+    linear-gradient(160deg,#2a1535,#13091a 70%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), inset 0 0 18px rgba(0,0,0,.7);
+  transition:opacity .38s ease, transform .38s ease;
+}
+.cell::after{ /* runa */
+  content:attr(data-rune);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:"Noto Sans Runic",serif;font-size:calc(var(--bw) / var(--c) * .38);
+  color:rgba(255,120,170,.55);text-shadow:0 0 8px rgba(255,79,139,.6);
+  transition:opacity .3s, transform .38s;
+}
+.cell.open::before{opacity:0;transform:scale(.6)}
+.cell.open::after{opacity:0;transform:scale(1.6)}
+.cell.open{box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.board.won .cell.open{box-shadow:none}
+.cell.flip::before{animation:flip .38s}
+@keyframes flip{40%{filter:brightness(1.8)}}
+.cell.hint::after{opacity:1 !important;transform:none !important;color:var(--teal);text-shadow:0 0 10px var(--teal),0 0 20px var(--teal);content:"✦";font-family:Cinzel,serif}
+.cell.hint{animation:hint 1s ease-in-out 3;z-index:2}
+@keyframes hint{50%{box-shadow:inset 0 0 0 2px var(--teal), 0 0 18px var(--teal)}}
+.cell:focus-visible{box-shadow:inset 0 0 0 2px var(--peach)}
+.ripple{position:absolute;border-radius:50%;pointer-events:none;border:2px solid rgba(255,79,139,.8);animation:rip .5s ease-out forwards;z-index:3}
+@keyframes rip{from{opacity:1;transform:translate(-50%,-50%) scale(.2)}to{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
+.board.won{animation:glow 1.8s ease-out}
+@keyframes glow{0%{box-shadow:0 0 0 1px var(--rose),0 0 100px rgba(255,79,139,.8)}100%{box-shadow:0 0 0 1px rgba(255,79,139,.35),0 0 40px rgba(255,79,139,.18)}}
+
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn{font-family:Cinzel,serif;font-size:13px;letter-spacing:.1em;padding:9px 14px;border-radius:4px;border:1px solid var(--line);background:rgba(255,255,255,.04);transition:.15s}
+.btn:hover{border-color:rgba(255,255,255,.25)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.primary{border-color:var(--blood);background:linear-gradient(180deg,#b3173a,#6d0a1b);box-shadow:0 0 18px rgba(155,15,37,.4)}
+.hint-text{font-size:14px;color:var(--muted);font-style:italic;text-align:center;max-width:520px}
+footer{font-size:13px;color:var(--muted);opacity:.7;text-align:center}
+
+.ov{position:fixed;inset:0;z-index:30;display:none;background:rgba(6,3,9,.86);backdrop-filter:blur(6px);overflow-y:auto;padding:24px 16px}
+.ov.show{display:flex;align-items:flex-start;justify-content:center}
+.card{margin:auto;max-width:720px;width:100%;border:1px solid rgba(255,79,139,.3);border-radius:8px;background:linear-gradient(180deg,#1a0f22,#0e0813);box-shadow:0 0 60px rgba(155,15,37,.35);padding:22px;-webkit-user-select:text;user-select:text}
+.gate{text-align:center;max-width:460px}
+.gate .age{display:inline-block;font-family:Cinzel,serif;font-size:30px;font-weight:700;border:2px solid var(--blood);color:var(--rose);border-radius:6px;padding:2px 14px;margin-bottom:12px}
+.gate p{margin:10px 0;color:#d7c6dd}
+.gate .row{display:flex;gap:10px;justify-content:center;margin-top:16px}
+.win{display:grid;grid-template-columns:minmax(0,240px) 1fr;gap:20px;align-items:start}
+.win img{width:100%;border-radius:6px;box-shadow:0 0 30px rgba(255,79,139,.35);display:block}
+.win h2{font-family:Cinzel,serif;font-size:22px;letter-spacing:.12em;color:var(--peach)}
+.win .kicker{font-family:Cinzel,serif;font-size:12px;letter-spacing:.2em;color:var(--rose)}
+.win .lore p{margin:10px 0;line-height:1.45;color:#e2d4e7}
+.win blockquote{margin:14px 0;padding:8px 14px;border-left:2px solid var(--blood);font-style:italic;color:var(--peach)}
+.win .res{font-size:15px;color:var(--muted);margin:8px 0 14px}
+.win .res b{color:var(--ink)}
+.win .new{color:var(--teal);font-family:Cinzel,serif;font-size:12px;letter-spacing:.12em;margin-left:6px}
+.win .row{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:600px){.win{grid-template-columns:1fr}.win img{max-width:220px;margin:0 auto}}
+.drip{height:10px;margin:-22px -22px 14px;border-radius:8px 8px 0 0;
+  background:
+    radial-gradient(circle at 10% 0, var(--blood) 6px, transparent 7px),
+    radial-gradient(circle at 31% 0, var(--blood) 9px, transparent 10px),
+    radial-gradient(circle at 57% 0, var(--blood) 5px, transparent 6px),
+    radial-gradient(circle at 78% 0, var(--blood) 8px, transparent 9px),
+    linear-gradient(var(--blood),var(--blood)) top/100% 3px no-repeat}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>ALITH YNGVIRLD</h1>
+    <div class="sub">o véu do não-oculto</div>
+    __GAMES__
+  </header>
+
+  <nav class="chapters" id="chapters" aria-label="Capítulos"></nav>
+  <div class="title-ch" id="chTitle"></div>
+
+  <div class="stats">
+    <span>Toques<b id="sTaps">0</b></span>
+    <span>Meta<b id="sPar">—</b></span>
+    <span>Tempo<b id="sTime">0:00</b></span>
+    <span>Recorde<b id="sBest">—</b></span>
+  </div>
+
+  <div class="board" id="board" aria-label="Tabuleiro"></div>
+
+  <div class="controls">
+    <button class="btn primary" id="bNew">Novo véu</button>
+    <button class="btn" id="bUndo" disabled>Desfazer</button>
+    <button class="btn" id="bHint">Sussurro</button>
+  </div>
+  <div class="hint-text">Tocar num quadrado vira ele e os quatro vizinhos: o que está coberto se revela, o que está revelado se cobre. Descubra a imagem inteira.</div>
+  <footer>Arte: @marknogart · Uso pessoal</footer>
+</div>
+
+<div class="ov" id="gate">
+  <div class="card gate">
+    <div class="drip"></div>
+    <div class="age">18+</div>
+    <p><b>Conteúdo adulto.</b> Nudez sugerida, sangue e temas sombrios.</p>
+    <p style="font-style:italic;color:var(--muted)">"Basta saber de qual lado da batalha você escolhe estar, junto ou contra."</p>
+    <div class="row">
+      <button class="btn primary" id="gYes">Tenho 18 anos ou mais</button>
+      <button class="btn" id="gNo">Sair</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="winOv">
+  <div class="card">
+    <div class="drip"></div>
+    <div class="win">
+      <img id="wImg" alt="Alith Yngvirld">
+      <div>
+        <div class="kicker" id="wKick"></div>
+        <h2 id="wTitle"></h2>
+        <div class="res" id="wRes"></div>
+        <div class="lore" id="wLore"></div>
+        <div class="row" id="wBtns"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const IMG = "__IMG__";
+
+const CHAPTERS = [
+  { n:"I", t:"Aletheia", s:"o nome escolhido", c:3, r:4,
+    lore:[
+      "Ela não se lembra do nome com que nasceu. Então escolheu um.",
+      "<b>Alith</b>, de <i>Aletheia</i>: o não-oculto, o não-escondido, o não-dissimulado. A verdade é aquilo que se mostra como é, aos olhos do corpo e do espírito.",
+      "E ela nunca se escondeu de ninguém."
+    ],
+    quote:"A verdade é a manifestação daquilo que é, tal como é." },
+  { n:"II", t:"Yngvihildr", s:"paz e guerra no mesmo sangue", c:4, r:5,
+    lore:[
+      "<b>Yngvi</b> é o nome mais antigo de Freyr, irmão gêmeo de Freyja: colheita, fertilidade, casamento, alegria e paz.",
+      "<b>Hildr</b> é a batalha. A palavra que o tempo arrastou até virar <i>hell</i>.",
+      "Yngvihildr. Yngvirld. A origem, a história e tudo o que ela atravessou para continuar de pé."
+    ],
+    quote:"Uma adaptação entre a origem, a história e a sua superação." },
+  { n:"III", t:"A Voz", s:"dois metros e dez de aço", c:5, r:6,
+    lore:[
+      "Dois metros e dez. Uns cento e vinte quilos, se alguém um dia a visse sem armadura. Ninguém viu.",
+      "Aparenta entre quarenta e cinquenta anos. Deve estar perto dos cento e cinquenta. Ela não confirma.",
+      "Mas o que rende os homens não é o tamanho. É a voz: madura, aveludada, agridoce. Uma dança estreita entre o medo e a inspiração."
+    ],
+    quote:"Basta saber de qual lado da batalha você escolhe estar: junto, ou contra." },
+  { n:"IV", t:"As Cicatrizes", s:"espólios que não se contam", c:5, r:7,
+    lore:[
+      "Ela coleciona o que conquista. Às vezes num baú. Sempre na memória.",
+      "Busca a verdade e o bem, mesmo quando o preço é sangue, o dela ou o de quem estiver no caminho.",
+      "Prende o cabelo em trança para que ninguém deixe de ver as cicatrizes do rosto. Tem orgulho delas. Nunca disse como as ganhou."
+    ],
+    quote:"Em algum lugar da sua história alguém as conheceu. Nunca saberemos quem." },
+  { n:"V", t:"A Paladina", s:"a lua cheia na noite mais escura", c:6, r:8,
+    lore:[
+      "Paladina de Atraídes. Os votos dela vão para o bem maior e para a verdade, acima de deuses presos à ordem e ao caos.",
+      "Esqueceu boa parte da vida: a infância, os traços que a moldaram, talvez o caminho de casa. Uma casa no campo, um horizonte com ilhas ao fundo. Nunca voltou.",
+      "Por ora coleciona vitórias. Lembrar seria só mais um espólio."
+    ],
+    quote:"Os objetivos são claros como a luz da lua cheia, dentro da mais escura noite." }
+];
+const EPILOGUE = "Para quem já dormiu com as estrelas como único teto, é fácil viver com o minimalismo da realidade. Ela segue firme.";
+const RUNES = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ";
+
+/* ---------- persistência ---------- */
+const KEY = "alith-veu-v1";
+function load(k){ try{ return JSON.parse(localStorage.getItem(k)) || {}; }catch(e){ return {}; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} }
+const store = Object.assign({ unlocked:1, best:{}, adult:false }, load(KEY));
+if(load("alith-puzzle-v1").adult || load("alith-jigsaw-v1").adult) store.adult = true;
+
+/* ---------- estado ---------- */
+const $ = id => document.getElementById(id);
+const board = $("board");
+let ch = 0, C = 3, R = 4, N = 12, st = null, cells = [];
+let taps = 0, par = 0, hints = 0, history = [], elapsed = 0, t0 = 0, timer = null, playing = false;
+
+function fmt(s){ const m = Math.floor(s/60); return m + ":" + String(s%60).padStart(2,"0"); }
+function nbrs(i){
+  const x = i % C, y = Math.floor(i / C), out = [i];
+  if(x>0) out.push(i-1); if(x<C-1) out.push(i+1);
+  if(y>0) out.push(i-C); if(y<R-1) out.push(i+C);
+  return out;
+}
+
+/* ---------- solucionador (eliminação de Gauss em GF(2)) ---------- */
+// devolve o conjunto mínimo de toques que zera o estado s
+function solve(s){
+  const M = [];
+  for(let i=0;i<N;i++){ const row = new Uint8Array(N+1); for(const j of nbrs(i)) row[j] = 1; row[N] = s[i]; M.push(row); }
+  const pivRow = new Array(N).fill(-1); let r = 0;
+  for(let c=0;c<N && r<N;c++){
+    let p = r; while(p<N && !M[p][c]) p++;
+    if(p===N) continue;
+    [M[p], M[r]] = [M[r], M[p]];
+    for(let q=0;q<N;q++) if(q!==r && M[q][c]){ const a = M[q], b = M[r]; for(let k=c;k<=N;k++) a[k] ^= b[k]; }
+    pivRow[c] = r; r++;
+  }
+  for(let q=r;q<N;q++) if(M[q][N]) return null;   // sem solução (não deve ocorrer)
+  const free = []; for(let c=0;c<N;c++) if(pivRow[c] < 0) free.push(c);
+  const lim = Math.min(free.length, 14);
+  let best = null;
+  for(let mask=0; mask < (1<<lim); mask++){
+    const x = new Uint8Array(N);
+    free.forEach((f,k) => { x[f] = k < lim ? (mask>>k)&1 : 0; });
+    for(let c=0;c<N;c++) if(pivRow[c] >= 0){
+      const row = M[pivRow[c]]; let v = row[N];
+      for(const f of free) if(row[f] && x[f]) v ^= 1;
+      x[c] = v;
+    }
+    const w = x.reduce((a,b)=>a+b, 0);
+    if(!best || w < best.w) best = { w, x };
+  }
+  return [...best.x.keys()].filter(i => best.x[i]);
+}
+
+/* ---------- partida ---------- */
+function renderChapters(){
+  const nav = $("chapters"); nav.innerHTML = "";
+  CHAPTERS.forEach((c,i)=>{
+    const b = document.createElement("button");
+    b.className = "ch" + (i===ch ? " on" : "");
+    b.disabled = i >= store.unlocked;
+    b.title = b.disabled ? "Bloqueado" : `${c.t} (${c.c}×${c.r})`;
+    b.innerHTML = (b.disabled ? "🔒 " : "") + c.n + (store.best[i] ? '<span class="done">✦</span>' : "");
+    b.onclick = () => { if(!b.disabled){ ch = i; start(); } };
+    nav.appendChild(b);
+  });
+}
+
+function generate(){
+  const minPar = Math.max(3, Math.round(N * .3));
+  for(let tries=0; tries<200; tries++){
+    const s = new Uint8Array(N);
+    for(let i=0;i<N;i++) if(Math.random() < .5) for(const j of nbrs(i)) s[j] ^= 1;
+    if(s.every(v => !v)) continue;
+    const sol = solve(s);
+    if(sol && sol.length >= minPar) return { s, par: sol.length };
+  }
+  const s = new Uint8Array(N).fill(1);
+  return { s, par: solve(s).length };
+}
+
+function start(){
+  const c = CHAPTERS[ch];
+  C = c.c; R = c.r; N = C*R;
+  stopTimer(); elapsed = 0; taps = 0; hints = 0; history = []; playing = true;
+  const g = generate(); st = g.s; par = g.par;
+  board.classList.remove("won");
+  board.style.gridTemplateColumns = `repeat(${C}, 1fr)`;
+  board.style.gridTemplateRows = `repeat(${R}, 1fr)`;
+  board.style.setProperty("--c", C);
+  board.innerHTML = ""; cells = [];
+  for(let i=0;i<N;i++){
+    const d = document.createElement("div");
+    d.className = "cell"; d.tabIndex = 0;
+    d.dataset.rune = RUNES[Math.floor(Math.random()*RUNES.length)];
+    d.setAttribute("role", "button");
+    d.addEventListener("click", e => tap(i, e));
+    d.addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); tap(i); } });
+    board.appendChild(d); cells.push(d);
+  }
+  $("chTitle").innerHTML = `CAPÍTULO ${c.n} · ${c.t.toUpperCase()}<small>${C}×${R}</small>`;
+  paint(); updStats(); renderChapters();
+}
+
+function paint(changed){
+  cells.forEach((d,i)=>{
+    d.classList.toggle("open", !st[i]);
+    if(changed && changed.includes(i)){ d.classList.remove("flip"); void d.offsetWidth; d.classList.add("flip"); }
+  });
+}
+
+function toggle(i){ const ns = nbrs(i); for(const j of ns) st[j] ^= 1; paint(ns); }
+
+function tap(i, e){
+  if(!playing) return;
+  startTimer(); clearHint();
+  toggle(i); taps++; history.push(i);
+  if(e && e.clientX){
+    const r = board.getBoundingClientRect(), rp = document.createElement("div");
+    const sz = r.width / C * 1.4;
+    rp.className = "ripple";
+    Object.assign(rp.style, { left:(e.clientX-r.left)+"px", top:(e.clientY-r.top)+"px", width:sz+"px", height:sz+"px" });
+    board.appendChild(rp); setTimeout(()=>rp.remove(), 520);
+  }
+  if(navigator.vibrate) try{ navigator.vibrate(8); }catch(err){}
+  updStats();
+  if(st.every(v => !v)) win();
+}
+
+function undo(){
+  if(!playing || !history.length) return;
+  clearHint(); toggle(history.pop()); taps--; updStats();
+}
+
+let hintCell = null;
+function clearHint(){ if(hintCell !== null){ cells[hintCell].classList.remove("hint"); hintCell = null; } }
+function hint(){
+  if(!playing) return;
+  clearHint();
+  const sol = solve(st); if(!sol || !sol.length) return;
+  hintCell = sol[Math.floor(Math.random()*sol.length)];
+  cells[hintCell].classList.add("hint");
+  hints++; startTimer(); updStats();
+}
+
+function updStats(){
+  $("sTaps").textContent = taps;
+  $("sPar").textContent = par;
+  $("sTime").textContent = fmt(elapsed);
+  const b = store.best[ch];
+  $("sBest").textContent = b ? `${b.taps} · ${fmt(b.time)}` : "—";
+  $("bUndo").disabled = !playing || !history.length;
+  $("bHint").textContent = hints ? `Sussurro (${hints})` : "Sussurro";
+}
+function startTimer(){
+  if(timer) return;
+  t0 = Date.now() - elapsed*1000;
+  timer = setInterval(()=>{ elapsed = Math.floor((Date.now()-t0)/1000); updStats(); }, 250);
+}
+function stopTimer(){ clearInterval(timer); timer = null; }
+
+/* ---------- vitória ---------- */
+function win(){
+  playing = false; stopTimer(); clearHint();
+  board.classList.add("won");
+  const prev = store.best[ch];
+  const isNew = !prev || taps < prev.taps || (taps === prev.taps && elapsed < prev.time);
+  if(isNew) store.best[ch] = { taps, time: elapsed };
+  const firstClear = store.unlocked === ch+1 && ch+1 < CHAPTERS.length;
+  if(store.unlocked < ch+2) store.unlocked = Math.min(CHAPTERS.length, ch+2);
+  save(); renderChapters(); updStats();
+  setTimeout(()=>showWin(isNew, firstClear), 1200);
+}
+function showWin(isNew, firstClear){
+  const c = CHAPTERS[ch], lastCh = ch === CHAPTERS.length-1;
+  const perfect = taps === par && !hints;
+  $("wKick").textContent = `CAPÍTULO ${c.n} REVELADO`;
+  $("wTitle").textContent = c.t;
+  $("wRes").innerHTML = `<b>${taps}</b> toques (meta ${par}) em <b>${fmt(elapsed)}</b>` +
+    (hints ? ` · ${hints} sussurro${hints>1?"s":""}` : "") +
+    (perfect ? '<span class="new">PERFEITO</span>' : "") + (isNew ? '<span class="new">NOVO RECORDE</span>' : "");
+  $("wLore").innerHTML = c.lore.map(p=>`<p>${p}</p>`).join("") +
+    `<blockquote>“${c.quote}”</blockquote>` +
+    (lastCh ? `<p style="color:var(--peach)">${EPILOGUE}</p>` : "") +
+    (firstClear ? `<p style="color:var(--teal);font-size:15px">Capítulo ${CHAPTERS[ch+1].n} desbloqueado.</p>` : "");
+  const btns = $("wBtns"); btns.innerHTML = "";
+  const mk = (txt, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = txt; b.onclick = fn; btns.appendChild(b); };
+  if(!lastCh) mk("Próximo capítulo", "primary", ()=>{ closeWin(); ch++; start(); });
+  mk("Novo véu", lastCh ? "primary" : "", ()=>{ closeWin(); start(); });
+  mk("Contemplar", "", closeWin);
+  $("winOv").classList.add("show");
+}
+function closeWin(){ $("winOv").classList.remove("show"); }
+
+/* ---------- controles ---------- */
+$("bNew").onclick = start;
+$("bUndo").onclick = undo;
+$("bHint").onclick = hint;
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape") closeWin();
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z"){ e.preventDefault(); undo(); }
+});
+
+$("gYes").onclick = ()=>{ store.adult = true; save(); $("gate").classList.remove("show"); };
+$("gNo").onclick = ()=>{ document.body.innerHTML = '<p style="padding:40px;text-align:center;color:#a893b0;font-style:italic">Volte quando estiver pronto.</p>'; };
+if(!store.adult) $("gate").classList.add("show");
+
+board.style.backgroundImage = `url(${IMG})`;
+$("wImg").src = IMG;
+ch = Math.max(0, store.unlocked - 1);
+start();
+__PWA_SW__
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
-const CACHE = 'alith-1.2.0';
-const FILES = ['./', 'index.html', 'jigsaw.html', 'manifest.webmanifest',
+const CACHE = 'alith-1.3.0';
+const FILES = ['./', 'index.html', 'jigsaw.html', 'veu.html', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
