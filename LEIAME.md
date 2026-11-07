@@ -12,11 +12,12 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 - Pasta: `D:\Erick\Jogos\alith-slide-puzzle`
 - Repositório: https://github.com/ErickNogueira80/alith-slide-puzzle (**privado**; acesso só do Erick e de Mark666DooM, convidado como colaborador, que em conta pessoal sempre tem escrita)
 - Jogo pronto: `alith-puzzle.html` (arquivo único, imagem embutida; abre em qualquer navegador e no celular)
-- PWA: pasta `app/` (index.html, manifest, service worker offline, ícones). Só instala servida por HTTPS; hospedagem ainda não definida.
+- PWA: pasta `app/` (index.html, manifest, service worker offline, ícones). Só instala servida por HTTPS; hoje **não hospedado** (decisão de 2026-11-07), fica pronta para o futuro.
 - Fontes: `src/template.html` (código) + `src/alith.png` (arte original)
 
 ## Como rodar
-- Jogar: abrir `alith-puzzle.html`.
+- Jogar no PC: abrir `alith-puzzle.html`.
+- Jogar no celular (Android): baixar `alith-puzzle.html` do repositório (logado no GitHub), abrir pelo app Arquivos e escolher o Chrome. No iPhone a pré-visualização de arquivos não roda o jogo; usar um app com navegador de arquivos locais (ex.: Documents, da Readdle).
 - Depois de editar o template ou trocar a arte: `python build.py` (precisa de Pillow) gera o HTML avulso e a pasta `app/`. Ao mudar o jogo, suba `VERSION` no `build.py` para o PWA instalado se atualizar.
 
 ## Como joga
@@ -39,3 +40,4 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 - Embaralhamento por passeio aleatório a partir da solução, então toda partida tem solução.
 - Textos dos capítulos adaptados do background da personagem escrito pelo Erick.
 - 2026-11-07: versão PWA gerada pelo mesmo build. Para manter o acesso só entre os dois, a hospedagem precisa de login (ex.: Cloudflare Pages + Cloudflare Access), não link público.
+- 2026-11-07: Erick escolheu não hospedar; no celular o jogo é aberto como arquivo. Recordes podem não persistir quando aberto como arquivo.
