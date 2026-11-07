@@ -1,8 +1,8 @@
 # Alith Yngvirld · Quebra-cabeças (18+)
 
 ## O que é
-Três jogos com a arte da personagem **Alith Yngvirld**, paladina de
-Atraídes. **Deslizante** (slide puzzle, estilo 15-puzzle) **Encaixe** (jigsaw: peças com encaixes arrastadas de uma bandeja) e **O Véu** (estilo Lights Out: tocar vira o quadrado e os vizinhos; descobrir a imagem inteira). Cada jogo tem cinco capítulos de dificuldade crescente; cada um, ao ser resolvido, revela um trecho da
+Três quebra-cabeças e uma demo de plataforma com a arte da personagem **Alith Yngvirld**, paladina de
+Atraídes. **Deslizante** (slide puzzle, estilo 15-puzzle) **Encaixe** (jigsaw: peças com encaixes arrastadas de uma bandeja) e **O Véu** (estilo Lights Out: tocar vira o quadrado e os vizinhos; descobrir a imagem inteira). Mais uma **demo de plataforma 2D** com a Alith em pixel art. Cada jogo tem cinco capítulos de dificuldade crescente; cada um, ao ser resolvido, revela um trecho da
 história da personagem. Classificação 18+ (nudez sugerida, sangue, temas sombrios), com portão de idade.
 
 - **Cliente/área:** pessoal (lazer). Fora do assistente por decisão do Erick (2026-11-07).
@@ -11,10 +11,10 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 ## Onde está
 - Pasta: `D:\Erick\Jogos\alith-slide-puzzle`
 - Repositório: https://github.com/ErickNogueira80/alith-slide-puzzle (**PÚBLICO temporariamente** desde 2026-11-07 para teste no celular; Erick vai voltar para privado. Colaborador: Mark666DooM)
-- Jogo online (temporário): deslizante https://ericknogueira80.github.io/alith-slide-puzzle/app/ · encaixe https://ericknogueira80.github.io/alith-slide-puzzle/app/jigsaw.html · véu https://ericknogueira80.github.io/alith-slide-puzzle/app/veu.html (GitHub Pages; some ao voltar para privado)
-- Jogos prontos: `alith-puzzle.html` (deslizante) , `alith-jigsaw.html` (encaixe) e `alith-veu.html` (O Véu) (arquivo único, imagem embutida; abre em qualquer navegador e no celular)
+- Jogo online (temporário): deslizante https://ericknogueira80.github.io/alith-slide-puzzle/app/ · encaixe https://ericknogueira80.github.io/alith-slide-puzzle/app/jigsaw.html · véu https://ericknogueira80.github.io/alith-slide-puzzle/app/veu.html · plataforma https://ericknogueira80.github.io/alith-slide-puzzle/app/plataforma.html (GitHub Pages; some ao voltar para privado)
+- Jogos prontos: `alith-puzzle.html` (deslizante) , `alith-jigsaw.html` (encaixe) , `alith-veu.html` (O Véu) e `alith-plataforma.html` (demo de plataforma) (arquivo único, imagem embutida; abre em qualquer navegador e no celular)
 - PWA: pasta `app/` (index.html, manifest, service worker offline, ícones). Só instala servida por HTTPS; hoje **não hospedado** (decisão de 2026-11-07), fica pronta para o futuro.
-- Fontes: `src/template.html` (deslizante), `src/jigsaw.html` (encaixe), `src/veu.html` (O Véu) + `src/alith.png` (arte original)
+- Fontes: `src/template.html` (deslizante), `src/jigsaw.html` (encaixe), `src/veu.html` (O Véu), `src/plataforma.html` (plataforma) + `src/alith.png` (arte original)
 
 ## Como rodar
 - Jogar no PC: abrir `alith-puzzle.html`.
@@ -62,6 +62,14 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 | IV | 5×7 |
 | V | 6×8 |
 
+### Plataforma (demo)
+- Uma fase (124×12 blocos de 16 px; tela interna 320×180, escalada em pixels nítidos). A Alith é desenhada por código em pixel art seguindo o background (pele roxa acinzentada, cabelo rosa grisalho, chifres negros, olhos pêssego, armadura e capa cor de sangue); a arte do @marknogart só aparece nas telas de abertura e fim.
+- Correr, pulo variável (com coyote time e buffer), ataque de espada. Inimigos: rastejante (2 golpes) e lamento flutuante (1 golpe), com sangue ao morrer. Espinhos e fossos tiram vida.
+- 5 espólios com trechos da história, 2 fogueiras (checkpoint e vida cheia), portal no fim. 5 corações; ao zerar, volta à última fogueira.
+- Teclado (setas/WASD, Espaço/Z pular, X/J atacar, P pausa) e botões na tela no celular (melhor deitado). Sons sintetizados (WebAudio), com botão Mudo.
+- Recorde: mais espólios, desempate por tempo, em `alith-plataforma-v1`.
+- Fase validada com um bot que atravessa até o portal em navegador headless.
+
 ## Decisões
 - 2026-11-07: HTML único e local, por ser arte de terceiro com nudez.
 - 2026-11-07: repositório privado no GitHub, compartilhado só com Mark666DooM. Sem GitHub Pages: o site do Pages seria público. Para jogar, baixar o `alith-puzzle.html` e abrir no navegador.
@@ -72,3 +80,4 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 - 2026-11-07: repositório tornado público e GitHub Pages ligado, temporariamente, a pedido do Erick para testar no celular. Para encerrar: Settings → Pages → desligar e voltar a visibilidade para privado.
 - 2026-11-07: criada a versão de encaixe (jigsaw), com mesmos capítulos e textos; os dois jogos têm link um para o outro. PWA v1.2.0.
 - 2026-11-07: criado O Véu (Lights Out). Os três jogos têm navegação entre si no topo. PWA v1.3.0.
+- 2026-11-07: criada a demo de plataforma 2D (uma fase) para avaliar o caminho de um jogo maior. Menu entre os 4 jogos. PWA v1.4.0.
