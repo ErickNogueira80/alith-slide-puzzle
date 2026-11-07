@@ -10,6 +10,7 @@ história da personagem. Classificação 18+ (nudez sugerida, sangue, temas somb
 
 ## Onde está
 - Pasta: `D:\Erick\Jogos\alith-slide-puzzle`
+- Repositório: https://github.com/ErickNogueira80/alith-slide-puzzle (**privado**; acesso só do Erick e de Mark666DooM, convidado como colaborador, que em conta pessoal sempre tem escrita)
 - Jogo pronto: `alith-puzzle.html` (arquivo único, imagem embutida; abre em qualquer navegador e no celular)
 - Fontes: `src/template.html` (código) + `src/alith.png` (arte original)
 
